@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class RestDatasource {
   NetworkUtil _netUtil = new NetworkUtil();
-  static final BASE_URL = "http://wellonwater.com/";
-  //static final BASE_URL = "http://wellonwater.com/test/demotest/";
+  //static final BASE_URL = "http://wellonwater.com/";
+  static final BASE_URL = "http://wellonwater.com/test/demotest/";
   static final KARON = "https://karoninfotech.com/";
   static final BASE_URL_APP = BASE_URL + "api/";
   static final URL_GET_WEBSITE_TERM_AND_CONDITIONS = BASE_URL + "TermsCondition";
@@ -30,6 +30,10 @@ class RestDatasource {
   //Shopping
   static final GET_CATEGORY= BASE_URL_APP + "getcategorylist";
   static final GET_CATEGORY_PRODUCT= BASE_URL_APP + "categoryproductlist";
+  static final ADD_TO_CART= BASE_URL_APP + "addtocart";
+  static final GET_CART_LIST= BASE_URL_APP + "cartlist";
+  static final UPDATE_CART= BASE_URL_APP + "cartqunupdate";
+  static final ADD_TO_CARTLIST_DELETE= BASE_URL_APP + "addtocartlistdelete";
   //shoppping
 
   static final GET_PROCCESS_ORDER= BASE_URL_APP + "getprocessorderlist";

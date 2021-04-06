@@ -429,25 +429,31 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                 children: [
                                                   InkWell(
                                                     onTap: () async{
-                                                      bool available= await db.CheckProductInCart(data.cproduct_id);
-                                                      if(available)
-                                                        {
-                                                          Fluttertoast.showToast(msg: "Already Added In Cart",textColor: Colors.red,backgroundColor: Colors.white);
-                                                        }
-                                                      else
-                                                        {
-                                                          ProductCartList items = new ProductCartList();
-                                                          items.category_id = data.category_id;
-                                                          items.cproduct_id = data.cproduct_id;
-                                                          items.productname = data.productname;
-                                                          items.productprice =data.productprice;
-                                                          items.image1 = data.image1;
-                                                          items.qty = data.minmum_qua;
-                                                          items.minmum_qua = data.original_minmum_qua;
-                                                          db.saveCart(items);
-                                                          _refreshcartproductcount();
-                                                          EasyLoading.showSuccess('Added To Cart',duration: Duration(seconds: 1),dismissOnTap: true,);
-                                                        }
+                                                      setState(() {
+                                                        _isLoading=true;
+                                                      });
+                                                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                      _netUtil.post(RestDatasource.ADD_TO_CART,body: {
+                                                        "provider_id":prefs.getString("provider_id"),
+                                                        "cproduct_id":data.cproduct_id,
+                                                        "quantity":data.minmum_qua.toString(),
+                                                      }).then((dynamic res)
+                                                      {
+                                                        if(res["status"]=="insert")
+                                                          {
+                                                            setState(() {
+                                                              _isLoading=false;
+                                                            });
+                                                            EasyLoading.showSuccess('Added To Cart',duration: Duration(seconds: 1),dismissOnTap: true,);
+                                                          }
+                                                        else
+                                                          {
+                                                            setState(() {
+                                                              _isLoading=false;
+                                                            });
+                                                            Fluttertoast.showToast(msg: "Already Added In Cart",textColor: Colors.red,backgroundColor: Colors.white);
+                                                          }
+                                                      });
                                                     },
                                                     child: Container(
                                                       decoration: BoxDecoration(
@@ -456,7 +462,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                       ),
                                                       child: Padding(
                                                         padding: const EdgeInsets.only(left: 15,right: 15,top: 7,bottom: 7),
-                                                        child: Text("Add to Cart",style: TextStyle(fontSize: 16,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
+                                                        child: _isLoading?CircularProgressIndicator(backgroundColor: Colors.green,):Text("Add to Cart",style: TextStyle(fontSize: 16,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
                                                       ),
                                                     ),
                                                   ),

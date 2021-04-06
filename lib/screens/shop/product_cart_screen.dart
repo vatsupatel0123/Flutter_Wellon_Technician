@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellon_partner_app/data/database_helper.dart';
 import 'package:wellon_partner_app/data/rest_ds.dart';
+import 'package:wellon_partner_app/models/cart_list.dart';
 import 'package:wellon_partner_app/models/category_list.dart';
 import 'package:wellon_partner_app/models/categoryproduct_list.dart';
 import 'package:wellon_partner_app/models/pass_product_data.dart';
@@ -46,8 +47,9 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
   bool passwordVisible = true;
   NetworkUtil _netUtil = new NetworkUtil();
   String _otpcode;
-  Future<List<ProductCartList>> productcartListdata;
-  Future<List<ProductCartList>> productcartListfilterData;
+  SharedPreferences prefs;
+  Future<List<CartList>> productcartListdata;
+  Future<List<CartList>> productcartListfilterData;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey1 = new GlobalKey<RefreshIndicatorState>();
   final CarouselController _controller = CarouselController();
   var db = new DatabaseHelper();
@@ -90,8 +92,47 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
       //height=350;
     });
   }
+  _loadPref() async {
+    prefs= await SharedPreferences.getInstance();
+    int count=await db.getCountCart();
+    setState(() {
+      cartproductcount=count;
+      productcartListdata = _getCategoryData();
+      productcartListfilterData=productcartListdata;
+    });
+  }
+  Future<List<CartList>> _getCategoryData() async
+  {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return _netUtil.post(RestDatasource.GET_CART_LIST,body: {
+      "provider_id":prefs.getString("provider_id")
+    }).then((dynamic res)
+    {
+      if(res.toString()=="[]")
+      {
+        return null;
+      }
+      _loadCartData();
+      final items = res.cast<Map<String, dynamic>>();
+      print(items);
+      List<CartList> listofusers = items.map<CartList>((json) {
+        return CartList.fromJson(json);
+      }).toList();
+      List<CartList> revdata = listofusers.reversed.toList();
+      return revdata;
+    });
+  }
+  Future<List<CartList>> _refresh1() async
+  {
+    int count = await db.getCountCart();
+    setState(() {
+      cartproductcount=count;
+      productcartListdata = _getCategoryData();
+      productcartListfilterData=productcartListdata;
+    });
+  }
   _loadCartData() {
-    //productcartListdata=db.getcart();
     setState(() {
       selectedlistData.clear();
       if(productcartListdata.toString().length != 0) {
@@ -106,6 +147,14 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
         });
       }
     });
+    productcartListdata.then((value) => {
+      value.forEach((element) {
+        total=total+double.parse(element.productprice)*element.qty;
+        print(total);
+        setState(() {
+        });
+      })
+    });
   }
 
   void connectionChanged(dynamic hasConnection) {
@@ -114,52 +163,34 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
       //print(isOffline);
     });
   }
-  _loadPref() async {
-    total=0;
-    int count=await db.getCountCart();
-    setState(() {
-      cartproductcount=count;
-      productcartListdata=db.getcart();
-      productcartListdata.then((value) => {
-        value.forEach((element) {
-          total=total+double.parse(element.productprice)*element.qty;
-          print(total);
-          setState(() {
-
-          });
-        })
-      });
-    });
-    _loadCartData();
-  }
-  Future<List<CategoryProductList>> _getCategoryData() async
-  {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    return _netUtil.post(RestDatasource.GET_CATEGORY_PRODUCT,body: {
-      "category_id":"1"
-    }).then((dynamic res)
-    {
-      print(res);
-      if(res.toString()=="[]")
-      {
-        return null;
-      }
-      final items = res.cast<Map<String, dynamic>>();
-      print(items);
-      List<CategoryProductList> listofusers = items.map<CategoryProductList>((json) {
-        return CategoryProductList.fromJson(json);
-      }).toList();
-      List<CategoryProductList> revdata = listofusers.reversed.toList();
-      return revdata;
-    });
-  }
-  Future<List<CategoryProductList>> _refresh1() async
-  {
-    setState(() {
-      productcartListdata=db.getcart();
-    });
-  }
+  // Future<List<CategoryProductList>> _getCategoryData() async
+  // {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //   return _netUtil.post(RestDatasource.GET_CATEGORY_PRODUCT,body: {
+  //     "category_id":"1"
+  //   }).then((dynamic res)
+  //   {
+  //     print(res);
+  //     if(res.toString()=="[]")
+  //     {
+  //       return null;
+  //     }
+  //     final items = res.cast<Map<String, dynamic>>();
+  //     print(items);
+  //     List<CategoryProductList> listofusers = items.map<CategoryProductList>((json) {
+  //       return CategoryProductList.fromJson(json);
+  //     }).toList();
+  //     List<CategoryProductList> revdata = listofusers.reversed.toList();
+  //     return revdata;
+  //   });
+  // }
+  // Future<List<CategoryProductList>> _refresh1() async
+  // {
+  //   setState(() {
+  //     productcartListdata=db.getcart();
+  //   });
+  // }
   Future<void> _launchInBrowser(String url) async {
     if (await canLaunch(url)) {
       await launch(
@@ -206,7 +237,7 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                   key: _refreshIndicatorKey1,
                   color: Colors.black,
                   onRefresh: _refresh1,
-                  child: FutureBuilder<List<ProductCartList>>(
+                  child: FutureBuilder<List<CartList>>(
                     future: productcartListdata,
                     builder: (context,snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting)
@@ -223,7 +254,7 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                         );
                       }
                       return ListView(
-                        padding: EdgeInsets.only(top: 60),
+                        padding: EdgeInsets.only(top: 60,bottom: 150),
                         children: snapshot.data
                             .map((data) =>
                             Card(
@@ -243,11 +274,31 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                                         child: Align(
                                           alignment: Alignment.topRight,
                                           child: InkWell(
-                                            onTap: (){
-                                              db.deleteCartSingle(data.TableId);
-                                              _refresh1();
-                                              _loadPref();
-                                              Fluttertoast.showToast(msg: "Successfull Deleted",textColor: Colors.green,backgroundColor: Colors.white);
+                                            onTap: ()async{
+                                              final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              _netUtil.post(RestDatasource.ADD_TO_CARTLIST_DELETE,body: {
+                                                "provider_id":prefs.getString("provider_id"),
+                                                "cproduct_id":data.cproduct_id,
+                                              }).then((dynamic res)
+                                              {
+                                                print(res);
+                                                if(res["status"]=="Deleted")
+                                                {
+                                                  setState(() {
+                                                    _isLoading=false;
+                                                  });
+                                                  _refresh1();
+                                                  Fluttertoast.showToast(msg: "Successfull Deleted",textColor: Colors.green,backgroundColor: Colors.white);
+                                                }
+                                                else
+                                                {
+                                                  setState(() {
+                                                    _isLoading=false;
+                                                  });
+                                                  Fluttertoast.showToast(msg: "Try Again",textColor: Colors.red,backgroundColor: Colors.white);
+                                                }
+                                              });
+                                              //db.deleteCartSingle(data.TableId);
                                             },
                                             child: SizedBox.fromSize(
                                               size: Size(30, 30),// button width and height
@@ -290,7 +341,7 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                                       // ),
                                       Padding(
                                         padding: const EdgeInsets.only(top: 20),
-                                        child: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1,width: 100,)
+                                        child: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1??"16110442553409.png",width: 100,)
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 110,top: 20),
@@ -304,7 +355,7 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                                               children: [
                                                 //Text("500.00",style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
                                                 //SizedBox(width: 10,),
-                                                Text(data.productprice,style: TextStyle(fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
+                                                Text(data.productprice??"",style: TextStyle(fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
                                                 //SizedBox(width: 10,),
                                                 //Text("(10% off)",style: TextStyle(fontSize: 16,color: Color(0xff4cb050),fontWeight: FontWeight.w600),),
                                               ],
@@ -329,13 +380,19 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                                                   Padding(
                                                     padding: const EdgeInsets.only(left: 5),
                                                     child: InkWell(onTap:(){
+                                                      print(prefs.getString("provider_id"));
                                                       setState(() {
-                                                        _loadCartData();
-                                                        if(data.qty!=data.minmum_qua)
+                                                        //_loadCartData();
+                                                          if(data.qty.toString()!=data.minmum_qua)
                                                         {
-                                                          data.qty=data.qty-data.minmum_qua;
+                                                          data.qty=data.qty-int.parse(data.minmum_qua);
                                                           setState(() {
-                                                            total=total-double.parse(data.productprice)*data.minmum_qua;
+                                                            total=total-double.parse(data.productprice)*int.parse(data.minmum_qua);
+                                                          });
+                                                          _netUtil.post(RestDatasource.UPDATE_CART,body: {
+                                                            "provider_id":prefs.getString("provider_id"),
+                                                            "cproduct_id":data.cproduct_id,
+                                                            "quantity":data.qty.toString(),
                                                           });
                                                         }
                                                       });
@@ -346,10 +403,15 @@ class _ProductCartScreenState extends State<ProductCartScreen> with TickerProvid
                                                     padding: const EdgeInsets.only(right: 5),
                                                     child: InkWell(onTap:(){
                                                       setState(() {
-                                                        _loadCartData();
-                                                        data.qty=data.qty+data.minmum_qua;
+                                                        // _loadCartData();
+                                                        data.qty=data.qty+int.parse(data.minmum_qua);
                                                         setState(() {
-                                                          total=total+double.parse(data.productprice)*data.minmum_qua;
+                                                          total=total+double.parse(data.productprice)*int.parse(data.minmum_qua);
+                                                        });
+                                                        _netUtil.post(RestDatasource.UPDATE_CART,body: {
+                                                          "provider_id":prefs.getString("provider_id"),
+                                                          "cproduct_id":data.cproduct_id,
+                                                          "quantity":data.qty.toString()
                                                         });
                                                       });
                                                     },child: Image.asset("images/plus.png",fit: BoxFit.fill,height: 30,width: 30,)),

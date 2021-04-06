@@ -190,7 +190,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
       _searchQueryUser.clear();
       if(_currentIndex==0)
         LoadData.newLeadListfilterData=LoadData.newLeadListdata;
-      else if(_currentIndex==0)
+      else if(_currentIndex==1)
         LoadData.processLeadListfilterData=LoadData.processLeadListdata;
       else
         LoadData.completeLeadListfilterData=LoadData.completeLeadListdata;
