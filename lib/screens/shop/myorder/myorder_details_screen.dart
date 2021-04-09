@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:wellon_partner_app/utils/network_util.dart';
 
 class MYOrderDetailsScreen extends StatefulWidget {
-  String sporder_id;
+  String sporder_id,status;
   String order_date_time;
   String totalproduct;
   String totalpay;
@@ -37,7 +37,7 @@ class MYOrderDetailsScreen extends StatefulWidget {
   String landmark;
   String city;
   String state;
-  MYOrderDetailsScreen({this.sporder_id,this.order_date_time,this.totalproduct,this.totalpay,this.address1,this.address2,this.state,this.city,this.landmark,this.pincode,});
+  MYOrderDetailsScreen({this.sporder_id,this.status,this.order_date_time,this.totalproduct,this.totalpay,this.address1,this.address2,this.state,this.city,this.landmark,this.pincode,});
   @override
   _MYOrderDetailsScreenState createState() => _MYOrderDetailsScreenState();
 }
@@ -433,17 +433,35 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
                   ),
                 ),
               ),
-              Padding(
+              widget.status=="new"||widget.status=="process"?Padding(
                 padding: const EdgeInsets.only(top: 20,left: 20,right: 20),
-                child: Container(
-                  padding: const EdgeInsets.only(top: 13,bottom: 13),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10)
+                child: InkWell(
+                  onTap: () async{
+                    prefs=await SharedPreferences.getInstance();
+                    setState(() {
+                      _isLoading=true;
+                    });
+                    _netUtil.post(RestDatasource.MY_ORDER_CANCEL,body: {
+                      "provider_id":prefs.getString("provider_id"),
+                      "sporder_id":widget.sporder_id
+                    }).then((dynamic res)
+                    {
+                      print(res);
+                      setState(() {
+                        _isLoading=false;
+                      });
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 13,bottom: 13),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: _isLoading?Center(child: CircularProgressIndicator(),):Center(child: Text("Cancel Order",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
                   ),
-                  child: Center(child: Text("Cancel Order",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
                 ),
-              )
+              ):Container()
             ],
           ),
         ),

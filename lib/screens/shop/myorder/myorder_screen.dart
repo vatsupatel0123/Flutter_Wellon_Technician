@@ -163,6 +163,7 @@ class _MYOrderScreenState extends State<MYOrderScreen>{
                                 landmark:data.landmark,
                                 city:data.city,
                                 state:data.state,
+                                status: data.status,
                               ), type: PageTransitionType.rightToLeft,duration: Duration(milliseconds: 500)));
                             },
                             child: Padding(

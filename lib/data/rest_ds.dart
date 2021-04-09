@@ -94,6 +94,7 @@ class RestDatasource {
   static final CREATE_ORDER = BASE_URL_APP + "createsporder";
   static final MY_ORDER = BASE_URL_APP + "spproductorderlist";
   static final MY_ORDER_DETAILS = BASE_URL_APP + "spproductorderdetails";
+  static final MY_ORDER_CANCEL = BASE_URL_APP + "spordercancel";
   //Create Order
 
 
