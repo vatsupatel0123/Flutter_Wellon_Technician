@@ -1,23 +1,30 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info/package_info.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steps_indicator/steps_indicator.dart';
 import 'package:store_redirect/store_redirect.dart';
 import 'package:wellon_partner_app/data/database_helper.dart';
 import 'package:wellon_partner_app/data/rest_ds.dart';
 import 'package:wellon_partner_app/models/myorder_details_list.dart';
 import 'package:wellon_partner_app/models/myorderlist.dart';
+import 'package:wellon_partner_app/models/order_status_list.dart';
+import 'package:wellon_partner_app/models/pass_product_data.dart';
 import 'package:wellon_partner_app/screens/contactus/contactus.dart';
 import 'package:wellon_partner_app/screens/more/profile/myprofile_screen.dart';
 import 'package:wellon_partner_app/screens/more/refer_friend/refer_friend_screen.dart';
 import 'package:wellon_partner_app/screens/more/support_and_care/support_and_care_screen.dart';
 import 'package:wellon_partner_app/screens/more/terms_and_condition/terms_and_condition_screen.dart';
+import 'package:wellon_partner_app/screens/shop/myorder/reasons_screen.dart';
+import 'package:wellon_partner_app/screens/shop/myorder/select_product_return_screen.dart';
 import 'package:wellon_partner_app/screens/shop/product_cart_screen.dart';
 import 'package:wellon_partner_app/utils/common_helper.dart';
 import 'package:wellon_partner_app/utils/connectionStatusSingleton.dart';
@@ -60,6 +67,10 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
   String cgst,sgst,items;
   String _otpcode;
   Future<List<MyOrderDetailsList>> categoryproductListdata;
+  Future<List<OrderStatusList>> orderstatuslistdata;
+  var chkdate;
+  double gst=0.0;
+  List<ItemData> selectedlistData=new List<ItemData>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey1 = new GlobalKey<RefreshIndicatorState>();
 
   bool isOffline = false;
@@ -69,7 +80,7 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -81,16 +92,46 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
     cgst=(double.parse(widget.totalpay)-9/100).toString();
     setState(() {
       categoryproductListdata = _getCategoryData();
+      orderstatuslistdata = _getorderstatusData();
+      _loadCartData();
+    });
+  }
+  Future<List<OrderStatusList>> _getorderstatusData() async
+  {
+    return _netUtil.post(RestDatasource.MY_ORDER_STATUS,body: {
+      "sporder_id":widget.sporder_id
+    }).then((dynamic res)
+    {
+      for(var data in res)
+      {
+        if(data["log_status"]=="delivered")
+        {
+          setState(() {
+            chkdate=data["date"];
+          });
+        }
+      }
+      final items = res.cast<Map<String, dynamic>>();
+      //print(items);
+      List<OrderStatusList> listofusers = items.map<OrderStatusList>((json) {
+        return OrderStatusList.fromJson(json);
+      }).toList();
+      List<OrderStatusList> revdata = listofusers.reversed.toList();
+      return revdata;
+    });
+  }
+  Future<List<OrderStatusList>> _refresh1() async
+  {
+    setState(() {
+      orderstatuslistdata = _getorderstatusData();
     });
   }
   Future<List<MyOrderDetailsList>> _getCategoryData() async
   {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     return _netUtil.post(RestDatasource.MY_ORDER_DETAILS,body: {
       "sporder_id":widget.sporder_id
     }).then((dynamic res)
     {
-      print(res);
       final items = res.cast<Map<String, dynamic>>();
       //print(items);
       List<MyOrderDetailsList> listofusers = items.map<MyOrderDetailsList>((json) {
@@ -100,13 +141,22 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
       return revdata;
     });
   }
-  Future<List<MyOrderDetailsList>> _refresh1() async
+  Future<List<MyOrderDetailsList>> _refresh() async
   {
     setState(() {
       categoryproductListdata = _getCategoryData();
     });
   }
-
+  _loadCartData() {
+    categoryproductListdata.then((value) => {
+      value.forEach((element) {
+        gst=gst+(double.parse(element.gstprice=="null"?"0.00":element.gstprice)*int.parse(element.quantity));
+        print(gst);
+        setState(() {
+        });
+      })
+    });
+  }
   void connectionChanged(dynamic hasConnection) {
     setState(() {
       isOffline = !hasConnection;
@@ -129,84 +179,82 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
               color: Colors.white
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                elevation: 0,
-                margin: new EdgeInsets.fromLTRB(20, 20, 10, 0),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Order Details',
-                        style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Order Date',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                          ),
-                          Text(
-                            '${widget.order_date_time}',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Order Id',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                          ),
-                          Text(
-                            'WELLONPO${widget.sporder_id}',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Order Total',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                          ),
-                          Text(
-                            '₹${widget.totalpay} (${widget.totalproduct} Items)',
-                            style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    ],
+        body: RefreshIndicator(
+          onRefresh: _refresh1,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 0,
+                  margin: new EdgeInsets.fromLTRB(20, 20, 10, 0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order Details',
+                          style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Order Date',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
+                            ),
+                            Text(
+                              '${widget.order_date_time}',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Order Id',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
+                            ),
+                            Text(
+                              'WELLONPO${widget.sporder_id}',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Order Total',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
+                            ),
+                            Text(
+                              '₹${widget.totalpay} (${widget.totalproduct} Items)',
+                              style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              RefreshIndicator(
-                key: _refreshIndicatorKey1,
-                color: Colors.black,
-                onRefresh: _refresh1,
-                child: FutureBuilder<List<MyOrderDetailsList>>(
+                FutureBuilder<List<MyOrderDetailsList>>(
                   future: categoryproductListdata,
                   builder: (context,snapshot) {
-                    print(snapshot.error);
+                    //print(snapshot.error);
                     if (snapshot.connectionState == ConnectionState.waiting)
                     {
                       return Center(
@@ -222,6 +270,7 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
                     }
                     return ListView(
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.only(top: 0),
                       children: snapshot.data
                           .map((data) =>
@@ -268,201 +317,311 @@ class _MYOrderDetailsScreenState extends State<MYOrderDetailsScreen>{
                     );
                   },
                 ),
-              ),
-              Card(
-                elevation: 0.0,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                margin: new EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 20.0),
-                child: Container(
-                  //color : Colors.green.shade200,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 20, 5),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Shipping Address',
-                                style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                              Divider(),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                '${widget.address1}',
-                                style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "${widget.landmark}",
-                                style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                '${widget.address2}',
-                                style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "${widget.pincode}",
-                                style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                ((widget.city!=null)?widget.city:"")+
-                                    ((widget.state!=null)?" - "+widget.state:""),
-                                style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  ),
-                ),
-              ),
-              Card(
-                elevation: 0.0,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                margin: new EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 10.0),
-                child: Container(
-                  //color : Colors.green.shade200,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(15, 0, 20, 5),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Order Summary',
-                                style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                              Divider(),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Sub Total',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                                  ),
-                                  Text(
-                                    '${double.parse(widget.totalpay)*82/100}',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'SGST(9%)',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                                  ),
-                                  Text(
-                                    '${double.parse(widget.totalpay)*9/100}',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'CGST(9%)',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
-                                  ),
-                                  Text(
-                                    '${double.parse(widget.totalpay)*9/100}',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Order Total:',
-                                    style: GoogleFonts.lato(color:Colors.black,fontSize: 16,fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    '₹${widget.totalpay}',
-                                    style: GoogleFonts.lato(color:Colors.green,fontSize: 18,fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  ),
-                ),
-              ),
-              widget.status=="new"||widget.status=="process"?Padding(
-                padding: const EdgeInsets.only(top: 20,left: 20,right: 20),
-                child: InkWell(
-                  onTap: () async{
-                    prefs=await SharedPreferences.getInstance();
-                    setState(() {
-                      _isLoading=true;
-                    });
-                    _netUtil.post(RestDatasource.MY_ORDER_CANCEL,body: {
-                      "provider_id":prefs.getString("provider_id"),
-                      "sporder_id":widget.sporder_id
-                    }).then((dynamic res)
+                FutureBuilder<List<OrderStatusList>>(
+                  future: orderstatuslistdata,
+                  builder: (context,snapshot) {
+                    //print(snapshot.error);
+                    if (snapshot.connectionState == ConnectionState.waiting)
                     {
-                      print(res);
-                      setState(() {
-                        _isLoading=false;
-                      });
-                    });
+                      return Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                    else if (!snapshot.hasData) {
+                      return Container(
+                        height: double.infinity,
+                        child: Center(
+                          child: Text("No Data Available!"),
+                        ),
+                      );
+                    }
+                    return Card(
+                      elevation: 0.0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      margin: new EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order Summary',
+                            style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          Divider(),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 18),
+                                child: StepsIndicator(
+                                  selectedStep: snapshot.data.length,
+                                  nbSteps: snapshot.data.length,
+                                  doneStepColor: Colors.green,
+                                  doneLineColor: Colors.green,
+                                  undoneLineColor: Colors.red,
+                                  unselectedStepColorIn: Colors.red,
+                                  unselectedStepColorOut: Colors.red,
+                                  isHorizontal: false,
+                                  lineLength: 60,
+                                  doneStepSize: 15,
+                                  unselectedStepSize: 10,
+                                  selectedStepSize: 14,
+                                  selectedStepBorderSize: 1,
+                                  enableLineAnimation: true,
+                                  enableStepAnimation: true,
+                                  doneLineThickness: 2,
+                                ),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width*0.80,
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  reverse: true,
+                                  padding: EdgeInsets.only(bottom: 0,top: 10),
+                                  children: snapshot.data
+                                      .map((data) =>
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 29,left: 20),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(data.log_status=="new"?"Order Placed":data.log_status=="process"?"Order has been Process":data.log_status=="cancel"?"Order has been Cancel":data.log_status=="delivered"?"Order has been Delivered":data.log_status=="dispatch"?"Order has been Dispatch":data.log_status,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.w600),),
+                                            SizedBox(height: 5,),
+                                            Text(data.log_date_time,style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w600),),
+                                          ],
+                                        ),
+                                      )
+                                  ).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
                   },
+                ),
+                Card(
+                  elevation: 0.0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  margin: new EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 20.0),
                   child: Container(
-                    padding: const EdgeInsets.only(top: 13,bottom: 13),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10)
+                    //color : Colors.green.shade200,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 20, 5),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Shipping Address',
+                                  style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                Divider(),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  '${widget.address1}',
+                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  "${widget.landmark}",
+                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  '${widget.address2}',
+                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  "${widget.pincode}",
+                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  ((widget.city!=null)?widget.city:"")+
+                                      ((widget.state!=null)?" - "+widget.state:""),
+                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 19,fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
                     ),
-                    child: _isLoading?Center(child: CircularProgressIndicator(),):Center(child: Text("Cancel Order",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
                   ),
                 ),
-              ):Container()
-            ],
+                Card(
+                  elevation: 0.0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  margin: new EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 10.0),
+                  child: Container(
+                    //color : Colors.green.shade200,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 0, 20, 5),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Order Summary',
+                                  style: GoogleFonts.lato(fontSize: 20,fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                Divider(),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Sub Total',
+                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
+                                    ),
+                                    Text(
+                                      '₹${double.parse(widget.totalpay)-gst}',
+                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'GST',
+                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
+                                    ),
+                                    Text(
+                                      '₹$gst',
+                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Order Total:',
+                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16,fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      '₹${widget.totalpay}',
+                                      style: GoogleFonts.lato(color:Colors.green,fontSize: 18,fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    ),
+                  ),
+                ),
+                widget.status=="new"||widget.status=="process"?Padding(
+                  padding: const EdgeInsets.only(top: 20,left: 20,right: 20),
+                  child: InkWell(
+                    onTap: () async{
+                      Navigator.push(context, PageTransition(child: MYReasonsScreen(sporder_id: widget.sporder_id,screen: "Cancel"), type: PageTransitionType.rightToLeft));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(top: 13,bottom: 13),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: _isLoading?Center(child: CircularProgressIndicator(),):Center(child: Text("Cancel Order",style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
+                    ),
+                  ),
+                ):Container(),
+                // widget.status=="delivered"?Padding(
+                //   padding: const EdgeInsets.only(top: 20,left: 20,right: 20),
+                //   child: InkWell(
+                //     onTap: () async{
+                //       var now = DateTime.now();
+                //       var formattedDate;
+                //       now.month>=10?formattedDate = "${now.day}-${now.month}-${now.year}":formattedDate = "${now.day}-0${now.month}-${now.year}";
+                //       int day=int.parse(chkdate.split("-")[0]);
+                //       int month=int.parse(chkdate.split("-")[1]);;
+                //       int year=int.parse(chkdate.split("-")[2]);;
+                //       //var date = new DateTime.utc(year, month, day);
+                //       var date = new DateTime.utc(2021, 4, 17);
+                //       if(date.isAfter(now))
+                //       {
+                //         Navigator.push(context, PageTransition(child: SelectReturnProductScreen(sporder_id: widget.sporder_id,), type: PageTransitionType.rightToLeft));
+                //       }
+                //       else
+                //       {
+                //         if(chkdate==formattedDate)
+                //           {
+                //             Navigator.push(context, PageTransition(child: SelectReturnProductScreen(sporder_id: widget.sporder_id,), type: PageTransitionType.rightToLeft));
+                //           }
+                //         else
+                //           {
+                //            Fluttertoast.showToast(msg: "This Products is no longer eligible for return. Return Window closed on $chkdate",fontSize: 15,gravity: ToastGravity.BOTTOM,backgroundColor: Colors.red);
+                //           }
+                //       }
+                //     },
+                //     child: Container(
+                //       padding: const EdgeInsets.only(top: 13,bottom: 13),
+                //       decoration: BoxDecoration(
+                //           color: Colors.white,
+                //           borderRadius: BorderRadius.circular(10),
+                //           boxShadow: [
+                //             BoxShadow(
+                //               color: Colors.grey.shade400,
+                //               blurRadius: 10.0
+                //             )
+                //           ]
+                //       ),
+                //       child: _isLoading?Center(child: CircularProgressIndicator(),):Center(child: Text("Return Order",style: TextStyle(letterSpacing:1,color: Colors.red,fontSize: 20,fontWeight: FontWeight.w600),)),
+                //     ),
+                //   ),
+                // ):Container(),
+                SizedBox(height: 40,)
+              ],
+            ),
           ),
         ),
       );

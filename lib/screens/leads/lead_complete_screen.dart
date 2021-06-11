@@ -71,7 +71,7 @@ class _LeadCompleteScreenState extends State<LeadCompleteScreen> {
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<ProductKitList> listofusers = items.map<ProductKitList>((json) {
         return ProductKitList.fromJson(json);
       }).toList();
@@ -160,7 +160,7 @@ class _LeadCompleteScreenState extends State<LeadCompleteScreen> {
           is_ro = arguments['is_ro'];
           ro_img = arguments['ro_img'];
 
-          print(ro_img);
+          //print(ro_img);
 
           _isdataLoading=false;
         });

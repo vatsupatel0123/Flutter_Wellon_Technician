@@ -14,9 +14,16 @@ class CategoryProductList {
   final String image1;
   final String image2;
   final String image3;
+  final String gstrate;
+  final String gst_date;
+  final String price;
+  final String incl_excl_gst;
+  final String gst_price;
+  final String invoice_price;
   bool isexpanded;
   bool image_expand;
   bool iscollapsage;
+  bool isLoading;
   double imagesizeheight;
   double imagesizewidth;
   AlignmentGeometry alignment;
@@ -40,6 +47,13 @@ class CategoryProductList {
     @required this.imagesizeheight,
     @required this.imagesizewidth,
     @required this.alignment,
+    @required this.price,
+    @required this.gstrate,
+    @required this.gst_date,
+    @required this.incl_excl_gst,
+    @required this.gst_price,
+    @required this.invoice_price,
+    @required this.isLoading,
   });
 
   factory CategoryProductList.fromJson(Map<String, dynamic> json) {
@@ -49,14 +63,21 @@ class CategoryProductList {
       category_name: json['category_name'],
       is_active: json['is_active'],
       productname: json['productname'],
-      productprice: json['productprice'],
+      productprice: json['product_price'],
+      price: json['price'],
+      gstrate: json['gstrate'],
+      gst_date: json['gst_date'],
+      incl_excl_gst: json['incl_excl_gst'],
+      gst_price: json['gst_price'],
+      invoice_price: json['invoice_price'],
       minmum_qua: int.parse(json['minmum_qua']),
       original_minmum_qua: int.parse(json['minmum_qua']),
       image1: json['image1'],
-      image2: json['image2'],
-      image3: json['image3'],
+      image2: json['image2']==""?"null":json['image2'],
+      image3: json['image3']==""?"null":json['image3'],
       isexpanded: false,
       image_expand: false,
+      isLoading: false,
       iscollapsage: true,
       imagesizeheight: 125,
       imagesizewidth: 125,

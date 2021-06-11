@@ -41,7 +41,7 @@ class _LeadCancelScreenState extends State<LeadCancelScreen> {
         "provider_id":prefs.getString("provider_id"),
       }).then((dynamic res) async {
         setState(() {
-          print(res);
+          //print(res);
           getamt=res["sp_get_price"].toString();
           _isdataLoading=false;
         });
@@ -72,7 +72,7 @@ class _LeadCancelScreenState extends State<LeadCancelScreen> {
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<ProductKitList> listofusers = items.map<ProductKitList>((json) {
         return ProductKitList.fromJson(json);
       }).toList();
@@ -161,7 +161,7 @@ class _LeadCancelScreenState extends State<LeadCancelScreen> {
           is_ro = arguments['is_ro'];
           ro_img = arguments['ro_img'];
 
-          print(ro_img);
+          //print(ro_img);
 
           _isdataLoading=false;
         });

@@ -46,7 +46,7 @@ class _UserRegistrationThirdChangeScreenState extends State<UserRegistrationThir
     var location = new Location();
     location.onLocationChanged.listen((  currentLocation) {
       setState(() {
-        print("hii");
+        //print("hii");
         DEFAULT_LAT_LNG = LatLng(currentLocation.latitude,currentLocation.longitude);
       });
     });
@@ -59,7 +59,7 @@ class _UserRegistrationThirdChangeScreenState extends State<UserRegistrationThir
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

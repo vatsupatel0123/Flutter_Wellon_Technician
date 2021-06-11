@@ -46,7 +46,7 @@ class _ViewWalletScreenState extends State<ViewWalletScreen>{
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<WalletViewList> listofusers = items.map<WalletViewList>((json) {
         return WalletViewList.fromJson(json);
       }).toList();

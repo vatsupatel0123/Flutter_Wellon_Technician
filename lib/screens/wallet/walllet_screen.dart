@@ -64,7 +64,7 @@ class _WalletScreenState extends State<WallletScreen> with SingleTickerProviderS
         "provider_id":provider_id,
       }).then((dynamic res) async {
         setState(() {
-          print(provider_id);
+          //print(provider_id);
           total_credit=res["total_credit_normal"].toString();
           total_debit=res["total_debit_normal"].toString();
           total_balance=res["total_balance_normal"].toString();
@@ -86,7 +86,7 @@ class _WalletScreenState extends State<WallletScreen> with SingleTickerProviderS
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<WalletNormal> listofusers = items.map<WalletNormal>((json) {
         return WalletNormal.fromJson(json);
       }).toList();
@@ -117,7 +117,7 @@ class _WalletScreenState extends State<WallletScreen> with SingleTickerProviderS
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

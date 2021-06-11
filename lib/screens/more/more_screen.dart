@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:basic_utils/basic_utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -74,7 +75,7 @@ class _MoreScreenState extends State<MoreScreen> implements AuthStateListener{
     setState(() {
       _netUtil.post(RestDatasource.VERSION_CHECK, body: {}).then(
               (dynamic res) async {
-            print(res);
+            //print(res);
             setState(() {
               version = res["version"].toString();
               //version = "2.0";
@@ -109,7 +110,7 @@ class _MoreScreenState extends State<MoreScreen> implements AuthStateListener{
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -117,7 +118,7 @@ class _MoreScreenState extends State<MoreScreen> implements AuthStateListener{
         connectionStatus.connectionChange.listen(connectionChanged);
     _loadPref();
     _loadVersion();
-    // _initPackageInfo();
+    //_initPackageInfo();
   }
 
   void connectionChanged(dynamic hasConnection) {
@@ -697,7 +698,7 @@ class _MoreScreenState extends State<MoreScreen> implements AuthStateListener{
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
                           new Center(
-                            child: new Text(version!=null?"Version "+version:"3.0",style: GoogleFonts.lato(color:Colors.red,fontSize: 13,fontWeight: FontWeight.w600)),
+                            child: new Text(version!=null?"Version "+version:"2.0",style: GoogleFonts.lato(color:Colors.red,fontSize: 13,fontWeight: FontWeight.w600)),
                           ),
                           SizedBox(
                             height: 5,

@@ -45,7 +45,7 @@ class _UserRegistrationFourtScreenChangeState extends State<UserRegistrationFour
     _netUtil.post(RestDatasource.GET_REGISTER_DATA, body: {
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print(res);
+      //print(res);
       setState(() {
         _inst_ro_do_normal=res[0]["inst_ro_do_normal"]=="0.00"?null:res[0]["inst_ro_do_normal"];
         _inst_alkaline_normal=res[0]["inst_alkaline_normal"]=="0.00"?null:res[0]["inst_alkaline_normal"];
@@ -119,7 +119,7 @@ class _UserRegistrationFourtScreenChangeState extends State<UserRegistrationFour
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     _loadPref();
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
@@ -171,7 +171,7 @@ class _UserRegistrationFourtScreenChangeState extends State<UserRegistrationFour
       final Map arguments = ModalRoute.of(_ctx).settings.arguments as Map;
       mobileNo = arguments['mobileNo'];
       //mobileNo = "8460273125";
-      print(mobileNo);
+      //print(mobileNo);
     });
     if (isOffline) {
       return connection.nointernetconnection();

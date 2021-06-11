@@ -62,7 +62,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
       searchQueryUser = newQuery;
       if(_currentIndex==0)
       {
-        print("object");
+        //print("object");
         if(_searchQueryUser.toString().length>0)
         {
           //print(searchQuery.toString().length);
@@ -73,7 +73,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
             {
               if(record.order_id.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.customer_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_type_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_category.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_machine.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.order_date_time.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()))
               {
-                print(record.order_id);
+                //print(record.order_id);
                 filter.add(record);
               }
             }
@@ -97,7 +97,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
             {
               if(record.order_id.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.orderd_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_type_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_category.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_machine.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase())||record.order_date_time.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()))
               {
-                print(record.order_id);
+                //print(record.order_id);
                 filter.add(record);
               }
             }
@@ -121,7 +121,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
             {
               if(record.order_id.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.orderd_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_type_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_category.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_machine.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase())||record.order_date_time.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()))
               {
-                print(record.order_id);
+                //(record.order_id);
                 filter.add(record);
               }
             }
@@ -145,7 +145,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
             {
               if(record.order_id.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.orderd_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_type_name.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_category.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.o_machine.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()) || record.order_complete_date_time.toString().toLowerCase().toString().contains(searchQueryUser.toLowerCase()))
               {
-                print(record.order_id);
+                //print(record.order_id);
                 filter.add(record);
               }
             }
@@ -158,7 +158,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
         }
       }
     });
-    print("search query " + searchQueryUser);
+    //print("search query " + searchQueryUser);
   }
 
   List<Widget> _buildActions() {
@@ -695,7 +695,7 @@ class _LeadScreenState extends State<LeadScreen> with SingleTickerProviderStateM
                                 .map((data1) =>
                                 InkWell(
                                   onTap: () {
-                                    print("Check Pay Mode"+data1.paymode);
+                                    //print("Check Pay Mode"+data1.paymode);
                                     Navigator.of(context).pushNamed("/leadprogressscreen",
                                         arguments: {
                                           "order_id" : (data1.order_id!=null)?data1.order_id:"",

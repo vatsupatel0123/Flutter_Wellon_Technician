@@ -10,6 +10,7 @@ import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:pinch_zoom_image_last/pinch_zoom_image_last.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellon_partner_app/data/database_helper.dart';
@@ -27,6 +28,7 @@ import 'package:wellon_partner_app/utils/internetconnection.dart';
 import 'package:flutter/material.dart';
 import 'package:wellon_partner_app/utils/network_util.dart';
 
+
 import '../../sizeconfig.dart';
 
 class ShopProductListScreen extends StatefulWidget {
@@ -43,7 +45,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
   int counter = 0;
   double width,height=150,imagesizeheight=100,imagesizewidth=100;
   AlignmentGeometry _alignment = Alignment.centerLeft;
-  bool _isLoading = false,_isexpanded = false,_iscollaps = true,_movetext=false;
+  bool _isLoading = false,_isexpanded = false,_iscollaps = true,_movetext=false,imageview=false,zoomstart=false;
   final formKey = new GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   bool passwordVisible = true;
@@ -51,7 +53,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
   NetworkUtil _netUtil = new NetworkUtil();
   var db = new DatabaseHelper();
   ItemData item = new ItemData();
-  String _otpcode;
+  String _otpcode,imagepath="";
   Future<List<CategoryProductList>> categoryproductListdata;
   Future<List<CategoryProductList>> categoryproductListfilterData;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey1 = new GlobalKey<RefreshIndicatorState>();
@@ -65,13 +67,14 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
     _connectionChangeStream =
         connectionStatus.connectionChange.listen(connectionChanged);
     _loadPref();
+    _loadcartitems();
     width=widget.size;
   }
 
@@ -88,7 +91,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
   void connectionChanged(dynamic hasConnection) {
     setState(() {
       isOffline = !hasConnection;
-      //print(isOffline);
+      ////print(isOffline);
     });
   }
   _loadPref() async {
@@ -107,13 +110,13 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
       "category_id":widget.categoryid
     }).then((dynamic res)
     {
-      print(res);
+      //print(res);
       if(res.toString()=="[]")
       {
         return null;
       }
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<CategoryProductList> listofusers = items.map<CategoryProductList>((json) {
         return CategoryProductList.fromJson(json);
       }).toList();
@@ -123,19 +126,15 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
   }
   Future<List<CategoryProductList>> _refresh1() async
   {
-    int count = await db.getCountCart();
+    await LoadData.totalcartitems();
     setState(() {
-      cartproductcount=count;
       categoryproductListdata = _getCategoryData();
       categoryproductListfilterData=categoryproductListdata;
     });
   }
-    _refreshcartproductcount() async {
-    int count = await db.getCountCart();
-    setState(() {
-      cartproductcount=count;
-      print(cartproductcount);
-      print("cartproductcount");
+  void _loadcartitems() async {
+    await LoadData.totalcartitems();
+    setState((){
     });
   }
   Future<void> _launchInBrowser(String url) async {
@@ -150,26 +149,15 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
       throw 'Could not launch $url';
     }
   }
-  openBrowserTab() async {
-    await FlutterWebBrowser.openWebPage(url: "https://www.waterpurifieronline.com/", androidToolbarColor: Colors.lightGreenAccent);
-  }
-
   @override
   Widget build(BuildContext context) {
     startTime();
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   title: Text("Shopping",style: GoogleFonts.lato(color:Colors.white,letterSpacing: 1,fontWeight: FontWeight.w700),),
-        //   iconTheme: IconThemeData(
-        //     color: Colors.white, //change your color here
-        //   ),
-        //   backgroundColor: Colors.green,
-        // ),
           body:
           Stack(
             children: [
+
               AnimatedSize(duration:Duration(milliseconds: 700),vsync:this,curve: Curves.easeIn,child: Container(width:width,child: Image.asset("images/shoppingbg.png",height: double.infinity,fit: BoxFit.fill,))),
               Padding(
                   padding: const EdgeInsets.only(top: 100,left: 40),
@@ -199,7 +187,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                       );
                     }
                     return ListView(
-                      padding: EdgeInsets.only(top: 160),
+                      padding: EdgeInsets.only(top: 160,bottom: 40),
                       children: snapshot.data
                           .map((data) =>
                           Card(
@@ -214,7 +202,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                 padding: const EdgeInsets.all(20.0),
                                 child: Stack(
                                   children: [
-                                    (data.image1.toString()!=""&&data.image2.toString()!=""&&data.image3.toString()!=""?
+                                    (data.image1.toString()!="null"&&data.image2.toString()!="null"&&data.image3.toString()!="null"?
                                       AnimatedSize(
                                         duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,
                                         child: Container(
@@ -241,15 +229,15 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                 builder: (BuildContext context) {
                                                   return
                                                     (i==1)?
-                                                    AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),)))):(i==2)?
-                                                    AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:Image.network(RestDatasource.BASE_URL+"pimg2/"+data.image2),)))):AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg3/"+data.image3),))));
+                                                    InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg1/"+data.image1;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: PinchZoomImage(image: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),zoomedBackgroundColor: Color.fromRGBO(240, 240, 240, 1.0),),))))):(i==2)?
+                                                    InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg2/"+data.image2;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:PinchZoomImage(image: Image.network(RestDatasource.BASE_URL+"pimg2/"+data.image2),zoomedBackgroundColor: Color.fromRGBO(240, 240, 240, 1.0))))))):InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg3/"+data.image3;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: PinchZoomImage(image: Image.network(RestDatasource.BASE_URL+"pimg3/"+data.image3),zoomedBackgroundColor: Color.fromRGBO(500 ,500, 500, 1.0)),)))));
                                                 },
                                               );
                                             }).toList(),
                                           ),
                                         ),
                                       ):
-                                      data.image1.toString()!=""&&data.image2.toString()!=""&&data.image3.toString()==""?
+                                      data.image1.toString()!="null"&&data.image2.toString()!="null"&&data.image3.toString()=="null"?
                                       AnimatedSize(
                                         duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,
                                         child: Container(
@@ -275,14 +263,14 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                               return Builder(
                                                 builder: (BuildContext context) {
                                                   return (i==1)?
-                                                  AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:Image.network(RestDatasource.BASE_URL+"pimg2/"+data.image1),)))):AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg3/"+data.image2),))));
+                                                  InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg1/"+data.image1;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),))))):InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg2/"+data.image2;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg2/"+data.image2),)))));
                                                 },
                                               );
                                             }).toList(),
                                           ),
                                         ),
                                       ):
-                                      data.image1.toString()!=""&&data.image2.toString()==""&&data.image3.toString()!=""?
+                                      data.image1.toString()!="null"&&data.image2.toString()=="null"&&data.image3.toString()!="null"?
                                       AnimatedSize(
                                         duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,
                                         child: Container(
@@ -308,15 +296,16 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                               return Builder(
                                                 builder: (BuildContext context) {
                                                   return (i==1)?
-                                                  AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:Image.network(RestDatasource.BASE_URL+"pimg2/"+data.image1),)))):AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg3/"+data.image3),))));
+                                                  InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg1/"+data.image1;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child:Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),))))):
+                                                  InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg3/"+data.image3;});},child: AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height: data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg3/"+data.image3;});},child: Image.network(RestDatasource.BASE_URL+"pimg3/"+data.image3)),)))));
                                                 },
                                               );
                                             }).toList(),
                                           ),
                                         ),
                                       ):
-                                      data.image1.toString()!=""&&data.image2.toString()==""&&data.image3.toString()==""?
-                                      AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height:data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),)))):{}),
+                                      data.image1.toString()!="null"&&data.image2.toString()=="null"&&data.image3.toString()=="null"?
+                                      AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height:data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg1/"+data.image1;});},child: PinchZoomImage(image:  Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),zoomedBackgroundColor: Color.fromRGBO(240, 240, 240, 1.0))),)))):AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height:data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: InkWell(onTap: (){setState(() {imageview=true;imagepath=RestDatasource.BASE_URL+"pimg1/"+data.image1;});},child: PinchZoomImage(image:  Image.asset("images/nophoto.png"),zoomedBackgroundColor: Color.fromRGBO(240, 240, 240, 1.0))),))))),
                                     /*data.image1.toString()!=""?
                                     AnimatedSize(duration:Duration(milliseconds: 800),reverseDuration:Duration(milliseconds: 800),vsync:this,curve: Curves.easeIn,child: AnimatedAlign(alignment:data.alignment,duration:Duration(milliseconds: 800),child: Container(height:data.imagesizeheight,width: data.imagesizewidth,child: ClipRRect(child: Image.network(RestDatasource.BASE_URL+"pimg1/"+data.image1),)))):
                                     data.image2.toString()!=""?
@@ -336,26 +325,13 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              RatingBarIndicator(
-                                                rating: 4,
-                                                itemBuilder: (context, index) => Icon(
-                                                  Icons.star,
-                                                  color: Color(0xffffd30d),
-                                                ),
-                                                itemCount: 5,
-                                                itemSize: 30.0,
-                                                unratedColor: Color(0xffcccccc),
-                                              ),
+                                              Text("₹${data.invoice_price.toString()}",style: TextStyle(fontSize: 20,color: Color(0xff333333),fontWeight: FontWeight.w600),),
                                               SizedBox(height: 5,),
                                               Row(
                                                 children: [
-                                                  //Text("500.00",style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
-                                                  //SizedBox(width: 10,),
-                                                  Text("₹"+data.productprice,style: TextStyle(fontSize: 20,color: Color(0xff333333),fontWeight: FontWeight.w600),),
-                                                  SizedBox(width: 20,),
-
-                                                  //SizedBox(width: 10,),
-                                                  //Text("(10% off)",style: TextStyle(fontSize: 16,color: Color(0xff4cb050),fontWeight: FontWeight.w600),),
+                                                  Text("₹${data.gst_price.toString()} (${data.gstrate.toString()}%)",style: TextStyle(fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
+                                                  SizedBox(width: 5,),
+                                                  Text("${data.incl_excl_gst.toString()} GST",style: TextStyle(fontSize: 16,color: Color(0xff333333),fontWeight: FontWeight.w600),),
                                                 ],
                                               ),
                                               Padding(
@@ -402,16 +378,6 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                               ),
                                             ],
                                           ),
-                                          SizedBox(height: 10,),
-                                          SizedBox(height: 5,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 20,),
                                         ],
                                       ),
                                     ),
@@ -422,7 +388,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                           Visibility(
                                             visible: data.iscollapsage,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(left: 20,top: 140),
+                                              padding: const EdgeInsets.only(left: 20,top: 125),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.start,
                                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,9 +396,11 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                   InkWell(
                                                     onTap: () async{
                                                       setState(() {
-                                                        _isLoading=true;
+                                                        data.isLoading=true;
                                                       });
                                                       final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                      //print("data.minmum_qua.toString()");
+                                                      //print(data.minmum_qua.toString());
                                                       _netUtil.post(RestDatasource.ADD_TO_CART,body: {
                                                         "provider_id":prefs.getString("provider_id"),
                                                         "cproduct_id":data.cproduct_id,
@@ -442,14 +410,15 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                         if(res["status"]=="insert")
                                                           {
                                                             setState(() {
-                                                              _isLoading=false;
+                                                              _loadcartitems();
+                                                              data.isLoading=false;
                                                             });
                                                             EasyLoading.showSuccess('Added To Cart',duration: Duration(seconds: 1),dismissOnTap: true,);
                                                           }
                                                         else
                                                           {
                                                             setState(() {
-                                                              _isLoading=false;
+                                                              data.isLoading=false;
                                                             });
                                                             Fluttertoast.showToast(msg: "Already Added In Cart",textColor: Colors.red,backgroundColor: Colors.white);
                                                           }
@@ -462,14 +431,14 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                       ),
                                                       child: Padding(
                                                         padding: const EdgeInsets.only(left: 15,right: 15,top: 7,bottom: 7),
-                                                        child: _isLoading?CircularProgressIndicator(backgroundColor: Colors.green,):Text("Add to Cart",style: TextStyle(fontSize: 16,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
+                                                        child: data.isLoading?CircularProgressIndicator(backgroundColor: Colors.green,):Text("Add to Cart",style: TextStyle(fontSize: 16,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
                                                       ),
                                                     ),
                                                   ),
                                                   SizedBox(width: 10,),
                                                   InkWell(
                                                     onTap: (){
-                                                      String price=(double.parse(data.productprice)*data.minmum_qua).toString();
+                                                      String price=(double.parse(data.invoice_price)*data.minmum_qua).toString();
                                                       selectedlistData.clear();
                                                       ItemData item = new ItemData();
                                                       item.cproduct_id = data.cproduct_id;
@@ -478,7 +447,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                       selectedlistData.add(item);
                                                       var jsonData;
                                                       jsonData = jsonEncode(selectedlistData.map((e) => e.toMap()).toList());
-                                                      print(jsonData);
+                                                      //print(jsonData);
                                                       Navigator.push(
                                                         context,
                                                         PageTransition(
@@ -586,25 +555,6 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                 children: [
                                                   InkWell(
                                                     onTap:()async{
-                                                      bool available= await db.CheckProductInCart(data.cproduct_id);
-                                                      if(available)
-                                                      {
-                                                        Fluttertoast.showToast(msg: "Already Added In Cart",textColor: Colors.red,backgroundColor: Colors.white);
-                                                      }
-                                                      else
-                                                      {
-                                                        ProductCartList items = new ProductCartList();
-                                                        items.category_id = data.category_id;
-                                                        items.cproduct_id = data.cproduct_id;
-                                                        items.productname = data.productname;
-                                                        items.productprice =data.productprice;
-                                                        items.image1 = data.image1;
-                                                        items.qty = data.minmum_qua;
-                                                        items.minmum_qua = data.original_minmum_qua;
-                                                        db.saveCart(items);
-                                                        _refreshcartproductcount();
-                                                        EasyLoading.showSuccess('Added To Cart',duration: Duration(seconds: 1),dismissOnTap: true,);
-                                                      }
                                                     },
                                                     child: Container(
                                                       decoration: BoxDecoration(
@@ -620,7 +570,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                   SizedBox(width: 10,),
                                                   InkWell(
                                                     onTap: (){
-                                                      String price=(double.parse(data.productprice)*data.minmum_qua).toString();
+                                                      String price=(double.parse(data.invoice_price)*data.minmum_qua).toString();
                                                       selectedlistData.clear();
                                                       ItemData item = new ItemData();
                                                       item.cproduct_id = data.cproduct_id;
@@ -629,7 +579,7 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                                                       selectedlistData.add(item);
                                                       var jsonData;
                                                       jsonData = jsonEncode(selectedlistData.map((e) => e.toMap()).toList());
-                                                      print(jsonData);
+                                                      //print(jsonData);
                                                       Navigator.push(
                                                         context,
                                                         PageTransition(
@@ -716,13 +666,35 @@ class _ShopProductListScreenState extends State<ShopProductListScreen> with Tick
                       },child: Image.asset("images/interest.png",height: 35,width: 35,))),
                     ),
                     Padding(
-                        padding: const EdgeInsets.only(top: 31,right: 24),
+                        padding: const EdgeInsets.only(top: 32,right: 24),
                         child: Align(
                           alignment: Alignment.topRight,
-                          child: Text("$cartproductcount",style: TextStyle(fontSize: 14,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
+                          child: Text(LoadData.total_cart_items??"",style: TextStyle(fontSize: 14,color: Color(0xffffffff),fontWeight: FontWeight.w600),),
                         )
                     ),
                   ]
+              ),
+              Visibility(
+                visible: imageview,
+                child: InkWell(
+                  onTap: (){
+                    setState(() {
+                      imageview=false;
+                      imagepath="";
+                    });
+                  },
+                  child: Container(
+                    height: double.infinity,
+                    child: PinchZoomImage(
+                      image:Center(
+                        child: Image.network(
+                            imagepath
+                        ),
+                      ),
+                      //zoomedBackgroundColor: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ],
           )

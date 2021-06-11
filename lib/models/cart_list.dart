@@ -17,6 +17,13 @@ class CartList {
   String image2;
   String image3;
   String is_active;
+  String gstrate;
+  String gst_date;
+  String price;
+  String incl_excl_gst;
+  String gst_price;
+  String invoice_price;
+  String value;
 
 
   CartList({
@@ -36,6 +43,13 @@ class CartList {
     this.image2,
     this.image3,
     this.is_active,
+    this.gstrate,
+    this.gst_date,
+    this.price,
+    this.incl_excl_gst,
+    this.gst_price,
+    this.invoice_price,
+    this.value
   });
 
   factory CartList.fromJson(Map<String, dynamic> json) {
@@ -49,13 +63,20 @@ class CartList {
         updated_at:json["updated_at"].toString(),
         category_id:json["category_id"].toString(),
         productname:json["productname"].toString(),
-        productprice:json["productprice"].toString(),
+        productprice:json["product_price"].toString(),
         minmum_qua:json["minmum_qua"].toString(),
         image1:json["image1"].toString(),
         image2:json["image2"].toString(),
         image3:json["image3"].toString(),
         is_active:json["is_active"].toString(),
-        qty:int.parse(json["quantity"])
+        gstrate:json["gstrate"].toString(),
+        gst_date:json["gst_date"].toString(),
+        price:json["price"].toString(),
+        incl_excl_gst:json["incl_excl_gst"].toString(),
+        gst_price:json["gst_price"].toString(),
+        invoice_price:json["invoice_price"].toString(),
+        qty:int.parse(json["quantity"]),
+        value:""
     );
   }
 }

@@ -43,7 +43,7 @@ class _NotificationListScreenState extends State<NotificationListScreen>  implem
           "provider_id":"1",
         }).then((dynamic res) {
           final items = res.cast<Map<String, dynamic>>();
-          print(items);
+          //print(items);
           List<NotificationList> listofusers = items.map<NotificationList>((json) {
             return NotificationList.fromJson(json);
           }).toList();
@@ -97,7 +97,7 @@ class _NotificationListScreenState extends State<NotificationListScreen>  implem
             future: NotificationListData,
             builder: (context, snapshot) {
               //print(snapshot.data);
-              print(snapshot.hasData);
+              //print(snapshot.hasData);
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
                   child: CircularProgressIndicator(

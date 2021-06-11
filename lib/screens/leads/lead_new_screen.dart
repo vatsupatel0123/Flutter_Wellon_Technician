@@ -57,7 +57,7 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<ProductKitList> listofusers = items.map<ProductKitList>((json) {
         return ProductKitList.fromJson(json);
       }).toList();
@@ -79,7 +79,7 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
         "provider_id":provider_id,
       }).then((dynamic res) async {
         setState(() {
-          print(res);
+          //print(res);
           getamt=res["sp_get_price"].toString();
         });
       });
@@ -769,7 +769,7 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
                                                         "order_id": order_id,
                                                         "provider_id":prefs.getString("provider_id"),
                                                       }).then((dynamic res) async {
-                                                        print(res);
+                                                        //print(res);
                                                         if (res["status"] =="Order Rejected" || res["status"] =="Final Order Rejected") {
                                                           Navigator.of(context).pushNamed("/thanks",arguments: {
                                                             "status" : "reject"
@@ -884,7 +884,7 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
                                                         "order_id": order_id,
                                                         "provider_id":prefs.getString("provider_id"),
                                                       }).then((dynamic res) async {
-                                                        print(res);
+                                                        //print(res);
                                                           if (res["status"] =="Order Accepted") {
                                                             Navigator.of(context).pushNamed("/thanks",arguments: {
                                                               "status" : "accept"
@@ -1525,7 +1525,7 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
                                                         "order_id": order_id,
                                                         "provider_id":prefs.getString("provider_id"),
                                                       }).then((dynamic res) async {
-                                                        print(res);
+                                                        //print(res);
                                                         if (res["status"] =="Order Rejected" || res["status"] =="Final Order Rejected") {
                                                           Navigator.of(context).pushNamed("/thanks",arguments: {
                                                             "status" : "reject"
@@ -1636,13 +1636,13 @@ class _LeadNewScreenState extends State<LeadNewScreen> {
                                             Expanded(
                                               child: InkWell(
                                                 onTap: () {
-                                                  print("Hii Patel Vatsal");
-                                                  print(order_id);
+                                                  //print("Hii Patel Vatsal");
+                                                  //print(order_id);
                                                       _netUtil.post(RestDatasource.ACCEPT_NEW_ORDER, body: {
                                                         "order_id": order_id,
                                                         "provider_id":prefs.getString("provider_id"),
                                                       }).then((dynamic res) async {
-                                                        print(res);
+                                                        //print(res);
                                                           if (res["status"] =="Order Accepted") {
                                                             Navigator.of(context).pushNamed("/thanks",arguments: {
                                                               "status" : "accept"

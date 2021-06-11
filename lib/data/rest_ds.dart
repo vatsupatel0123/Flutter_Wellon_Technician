@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class RestDatasource {
   NetworkUtil _netUtil = new NetworkUtil();
-  //static final BASE_URL = "http://wellonwater.com/";
-  static final BASE_URL = "http://wellonwater.com/test/demotest/";
+  static final BASE_URL = "http://wellonwater.com/";
+  //static final BASE_URL = "http://wellonwater.com/test/demotest/";
   static final KARON = "https://karoninfotech.com/";
   static final BASE_URL_APP = BASE_URL + "api/";
   static final URL_GET_WEBSITE_TERM_AND_CONDITIONS = BASE_URL + "TermsCondition";
@@ -34,6 +34,7 @@ class RestDatasource {
   static final GET_CART_LIST= BASE_URL_APP + "cartlist";
   static final UPDATE_CART= BASE_URL_APP + "cartqunupdate";
   static final ADD_TO_CARTLIST_DELETE= BASE_URL_APP + "addtocartlistdelete";
+  static final CART_LIST_DELETE= BASE_URL_APP + "addtocartallproductdelete";
   //shoppping
 
   static final GET_PROCCESS_ORDER= BASE_URL_APP + "getprocessorderlist";
@@ -95,6 +96,8 @@ class RestDatasource {
   static final MY_ORDER = BASE_URL_APP + "spproductorderlist";
   static final MY_ORDER_DETAILS = BASE_URL_APP + "spproductorderdetails";
   static final MY_ORDER_CANCEL = BASE_URL_APP + "spordercancel";
+  static final MY_ORDER_STATUS = BASE_URL_APP + "sporderstatus";
+  static final GET_BANK_NAME = BASE_URL_APP + "getBankList";
   //Create Order
 
 
@@ -107,7 +110,7 @@ class RestDatasource {
       "sp_otp_code": password,
       "notification_token":token
     }).then((dynamic res) async {
-      print(res.toString());
+      //print(res.toString());
       if(res["status"]=="false")throw new Exception("error");
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString("spfullname", res["spfullname"].toString());

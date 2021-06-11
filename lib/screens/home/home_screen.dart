@@ -108,9 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    print("setstate called");
-    ConnectionStatusSingleton connectionStatus =
-    ConnectionStatusSingleton.getInstance();
+    //print("setstate called");
+    ConnectionStatusSingleton connectionStatus = ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
     _connectionChangeStream =
         connectionStatus.connectionChange.listen(connectionChanged);

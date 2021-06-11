@@ -57,7 +57,7 @@ class _MYOrderScreenState extends State<MYOrderScreen>{
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -78,9 +78,9 @@ class _MYOrderScreenState extends State<MYOrderScreen>{
       "provider_id":prefs.getString("provider_id")
     }).then((dynamic res)
     {
-      print(res);
+      //print(res);
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<MyorderList> listofusers = items.map<MyorderList>((json) {
         return MyorderList.fromJson(json);
       }).toList();
@@ -185,26 +185,21 @@ class _MYOrderScreenState extends State<MYOrderScreen>{
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      '${data.order_date_time}',
-                                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16,fontWeight: FontWeight.bold),
+                                                      'WELLONPO${data.sporder_id}',
+                                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16,fontWeight: FontWeight.w700),
                                                     ),
                                                     SizedBox(width: 20,),
                                                     Text(
-                                                      'WELLONPO${data.sporder_id}',
-                                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16,),
+                                                      '${data.order_date_time}',
+                                                      style: GoogleFonts.lato(color:Colors.black,fontSize: 16,fontWeight: FontWeight.w500),
                                                     ),
                                                   ],
                                                 ),
-                                                SizedBox(height: 5,),
-                                                Text(
-                                                  '${data.status.toUpperCase()}',
-                                                  style: GoogleFonts.lato(color:Colors.black,fontSize: 16,letterSpacing:1),
-                                                ),
-                                                SizedBox(height: 5,),
+                                                SizedBox(height: 3,),
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      'Items  :',
+                                                      'Items  : ',
                                                       style: GoogleFonts.lato(color:Colors.black,fontSize: 16),
                                                     ),
                                                     Text(
@@ -213,6 +208,8 @@ class _MYOrderScreenState extends State<MYOrderScreen>{
                                                     ),
                                                   ],
                                                 ),
+                                                SizedBox(height: 5,),
+                                                Text(data.status=="new"?"Order Placed":data.status=="process"?"Order has been Process":data.status=="cancel"?"Order has been Cancel":data.status=="delivered"?"Order has been Delivered":data.status=="dispatch"?"Order has been Dispatch":data.status,style: TextStyle(color: data.status=="new"?Colors.yellow:data.status=="process"?Colors.yellow:data.status=="cancel"?Colors.red:data.status=="delivered"?Colors.green:data.status=="dispatch"?Colors.yellow:data.status,fontSize: 19,fontWeight: FontWeight.w600),),
                                               ],
                                             ),
                                           ],

@@ -40,7 +40,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       _netUtil.post(RestDatasource.GET_ALL_PHOTO, body: {
         "mobile_numbers":mobile_numbers,
       }).then((dynamic res) async {
-        print(res);
+        //print(res);
         setState(() {
           profile_photo=res[0]["profile_photo"].toString();
           pancard_image=res[0]["pancard_image"].toString();
@@ -68,7 +68,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     _loadphoto();
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
@@ -94,7 +94,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "SPprofilepic": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web pro"+res["status"]);
+      //print("Web pro"+res["status"]);
       if (res["status"] == "yes") {
         profile=true;
       }
@@ -114,7 +114,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "SPprofilepic": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web pro"+res["status"]);
+      //print("Web pro"+res["status"]);
       if (res["status"] == "yes") {
         profile=true;
       }
@@ -164,7 +164,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "aadharcardphoto": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Output"+res["status"]);
+      //print("Web Output"+res["status"]);
       if (res["status"] == "yes") {
         aathar=true;
       }
@@ -183,7 +183,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "aadharcardphoto": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Output"+res["status"]);
+      //print("Web Output"+res["status"]);
       if (res["status"] == "yes") {
         aathar=true;
       }
@@ -233,7 +233,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "pancardimage": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Pancard"+res["status"]);
+      //print("Web Pancard"+res["status"]);
       if (res["status"] == "yes") {
         pancard=true;
       }
@@ -252,7 +252,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "pancardimage": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Pancard"+res["status"]);
+      //print("Web Pancard"+res["status"]);
       if (res["status"] == "yes") {
         pancard=true;
       }
@@ -301,7 +301,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "gstcertificate": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web GST"+res["status"]);
+      //print("Web GST"+res["status"]);
       if (res["status"] == "yes") {
         gst=true;
       }
@@ -320,7 +320,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "gstcertificate": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web GST"+res["status"]);
+      //print("Web GST"+res["status"]);
       if (res["status"] == "yes") {
         gst=true;
       }
@@ -372,7 +372,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "visitingcardfront": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web frant"+res["status"]);
+      //print("Web frant"+res["status"]);
       if (res["status"] == "yes") {
         visting=true;
       }
@@ -391,7 +391,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "visitingcardfront": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web frant"+res["status"]);
+      //print("Web frant"+res["status"]);
       if (res["status"] == "yes") {
         visting=true;
       }
@@ -441,7 +441,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "visitingcardback": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Back"+res["status"]);
+      //print("Web Back"+res["status"]);
       if (res["status"] == "yes") {
         vistingbb=true;
       }
@@ -460,7 +460,7 @@ class _UserRegistrationSecondScreenchangeState extends State<UserRegistrationSec
       "visitingcardback": base64Image,
       'mobile_numbers' : mobileNo,
     }).then((dynamic res) async {
-      print("Web Back"+res["status"]);
+      //print("Web Back"+res["status"]);
       if (res["status"] == "yes") {
         vistingbb=true;
       }

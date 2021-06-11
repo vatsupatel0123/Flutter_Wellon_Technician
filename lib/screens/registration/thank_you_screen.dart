@@ -29,7 +29,7 @@ class _ThankYouScreenState extends State<ThankYouScreen> with TickerProviderStat
     controller= GifController(vsync: this);
     controller.repeat(min:0,max:75,period:Duration(seconds:5));
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

@@ -116,7 +116,7 @@ class PlacePickerScreenState extends State<PlacePickerMyScreen> {
       locationData = await location.getLocation();
     } catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
-        print('Permission denied');
+        //print('Permission denied');
       }
       locationData = null;
     }
@@ -132,7 +132,7 @@ class PlacePickerScreenState extends State<PlacePickerMyScreen> {
     var addresses =
     await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
-    print("${first.featureName} : ${first.addressLine}");
+    //print("${first.featureName} : ${first.addressLine}");
     return first;
   }
 
@@ -391,7 +391,7 @@ class PlacePickerScreenState extends State<PlacePickerMyScreen> {
                               ? () async {
                             PlacePickerResult pickerResult = PlacePickerResult(
                                 selectedLatLng, selectedAddress);
-                            print(pickerResult);
+                            //print(pickerResult);
                             final coordinates = new Coordinates(
                                 pickerResult.latLng.latitude, pickerResult.latLng.longitude);
                             var addresses = await Geocoder.local.findAddressesFromCoordinates(

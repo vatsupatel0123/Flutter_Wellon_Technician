@@ -40,7 +40,7 @@ class LoginScreenState extends State <LoginScreen> with TickerProviderStateMixin
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -177,7 +177,7 @@ class LoginScreenState extends State <LoginScreen> with TickerProviderStateMixin
                                                     _netUtil.post(RestDatasource.URL_LOGIN, body: {
                                                       "mobile_numbers": _mobile_numbers,
                                                     }).then((dynamic res) async {
-                                                      print(res["status"]);
+                                                      //print(res["status"]);
                                                       if(res["status"] == "newregistration" || res["status"] == "halfregistration")
                                                       {
                                                         setState(() => _isLoading = false);

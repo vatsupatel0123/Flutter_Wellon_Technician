@@ -91,7 +91,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> with SingleTickerProv
       _netUtil.post(RestDatasource.GET_SP_SERVICE, body: {
         "mobile_numbers":mobile_numbers,
       }).then((dynamic res) async {
-        print(res);
+        //print(res);
         setState(() {
           inst_ro_do_instance=res[0]["inst_ro_do_instance"];
           inst_ro_do_normal=res[0]["inst_ro_do_normal"];
@@ -250,7 +250,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> with SingleTickerProv
       "SPprofilepic": base64Image,
       'mobile_numbers' : mobile_numbers,
     }).then((dynamic res) async {
-      print("Web pro"+res["status"]);
+      //print("Web pro"+res["status"]);
       if (res["status"] == "yes") {
       }
     });
@@ -266,7 +266,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> with SingleTickerProv
       "SPprofilepic": base64Image,
       'mobile_numbers' : mobile_numbers,
     }).then((dynamic res) async {
-      print("Web pro"+res["status"]);
+      //print("Web pro"+res["status"]);
       if (res["status"] == "yes") {
       }
     });
@@ -317,7 +317,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> with SingleTickerProv
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     _loadPref();
     _loadService();
     _loadReview();

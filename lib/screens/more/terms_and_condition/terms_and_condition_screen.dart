@@ -30,7 +30,7 @@ class _TermsAndConditionScreenState extends State<TermsAndConditionScreen> {
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

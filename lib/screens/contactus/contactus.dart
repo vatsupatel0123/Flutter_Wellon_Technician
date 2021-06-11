@@ -33,7 +33,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   @override
   initState() {
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

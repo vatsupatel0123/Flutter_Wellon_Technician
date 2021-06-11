@@ -49,7 +49,6 @@ class _LocationScreenState extends State<LocationScreen> {
         result = pickerResult.toString();
       });
     }
-
     return Scaffold(
         appBar: AppBar(
           title: Text("TE"),

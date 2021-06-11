@@ -30,7 +30,7 @@ class _AcceptScreenState extends State<AcceptScreen> with TickerProviderStateMix
     controller.repeat(min:0,max:75,period:Duration(seconds:5));
     controller1.repeat(min:0,max:23,period:Duration(seconds:2));
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

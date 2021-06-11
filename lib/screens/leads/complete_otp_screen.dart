@@ -80,11 +80,11 @@ class _CompleteOtpScreenState extends State<CompleteOtpScreen> {
     if (arguments != null) {
       setState(() {
         order_id = arguments['order_id'].toString();
-        print(order_id);
+        //print(order_id);
         _isLoading=false;
       });
     }else{
-      print("argument are Null");
+      //print("argument are Null");
     }
     return new Scaffold(
       //resizeToAvoidBottomPadding: false,
@@ -194,7 +194,7 @@ class _CompleteOtpScreenState extends State<CompleteOtpScreen> {
                           "order_id": order_id,
                           "provider_id": provider_id,
                         }).then((dynamic res) async {
-                          print(res);
+                          //print(res);
                           if(res["status"]=="true") {
                             setState(() {
                               resendMessageVisible = true;

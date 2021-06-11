@@ -97,7 +97,7 @@ class PlacePickerCustomScreenState extends State<MapScreen> {
       locationData = await location.getLocation();
     } catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
-        print('Permission denied');
+        //print('Permission denied');
       }
       locationData = null;
     }
@@ -113,7 +113,7 @@ class PlacePickerCustomScreenState extends State<MapScreen> {
     var addresses =
     await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
-    print("${first.featureName} : ${first.addressLine}");
+    //print("${first.featureName} : ${first.addressLine}");
     return first;
   }
 

@@ -66,7 +66,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
       _netUtil.post(RestDatasource.GET_REGISTER_DATA, body: {
       'mobile_numbers' : mobileNo,
       }).then((dynamic res) async {
-        print(res);
+        //print(res);
         setState(() {
           _firstname=res[0]["first_name"];
           _middlename=res[0]["middle_name"];
@@ -119,7 +119,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
   initState() {
     _loadPref();
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -133,7 +133,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
   void connectionChanged(dynamic hasConnection) {
     setState(() {
       isOffline = !hasConnection;
-      //print(isOffline);
+      ////print(isOffline);
     });
   }
 
@@ -439,7 +439,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                                             onChanged: (value) {
                                               setState(() {
                                                 _radioValue1 = value;
-                                                print(_radioValue1);
+                                                //print(_radioValue1);
                                               }
                                               );
 
@@ -453,7 +453,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                                             onChanged: (value) {
                                               setState(() {
                                                 _radioValue1 = value;
-                                                print(_radioValue1);
+                                                //print(_radioValue1);
                                               });
                                             },
                                           ),
@@ -975,7 +975,6 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                                   hintText: 'Aadhar Card No'
                               ),)
                         ),
-
                         SizedBox(
                           height: 3,
                         ),
@@ -1086,9 +1085,9 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                         if (_isLoading == false) {
                           final form = formKey.currentState;
                           if (form.validate()) {
-                            print("hii");
-                            print(_referral_namecontroller.text);
-                            print(form.validate());
+                            //print("hii");
+                            //print(_referral_namecontroller.text);
+                            //print(form.validate());
                             setState(() => _isLoading = true);
                             form.save();
                             NetworkUtil _netUtil = new NetworkUtil();
@@ -1111,7 +1110,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
                               "aadhar_number":_aadharcard,
                               "reg_sp_referal":(_referral_namecontroller.text!=null)?_referral_namecontroller.text:"",
                             }).then((dynamic res) async {
-                              print(res);
+                              //print(res);
                               if (res["statusupdate"] == "yes") {
                                 formKey.currentState.reset();
                                 //FlashHelper.successBar(context, message: "Successfull");
@@ -1214,7 +1213,7 @@ class _UserRegistrationScreenState extends State<UserRegistrationScreen> {
   }
   String validaterefel(String value) {
     var check=isUppercase(value);
-    print(check);
+    //print(check);
     if (check!=true)
       return 'Enter Refferal Code in Capital Letters';
     else

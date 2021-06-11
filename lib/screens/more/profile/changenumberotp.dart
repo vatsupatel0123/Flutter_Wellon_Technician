@@ -54,11 +54,11 @@ class ChangeNumberOtpScreenState extends State<ChangeNumberOtpScreen>{
       assert(t != null);
       setState(() {
         token=t;
-        print("token  "+token);
+        //print("token  "+token);
       });
     });
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();
@@ -220,7 +220,7 @@ class ChangeNumberOtpScreenState extends State<ChangeNumberOtpScreen>{
                                                     "mobile_numbers": mobileNo,
                                                     "new_mobile_number": newmobilenumber,
                                                   }).then((dynamic res) async {
-                                                print(res);
+                                                //print(res);
                                                 if (res["status"] == "true") {
                                                   setState(() => _isLoading = false);
                                                   final SharedPreferences prefs = await SharedPreferences.getInstance();

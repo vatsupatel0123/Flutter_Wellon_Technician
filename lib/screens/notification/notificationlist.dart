@@ -47,7 +47,7 @@ class _NotificationScreenState extends State<NotificationScreen>{
         }).then((dynamic res)
     {
       final items = res.cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<NotificationList> listofusers = items.map<NotificationList>((json) {
         return NotificationList.fromJson(json);
       }).toList();
@@ -104,7 +104,7 @@ class _NotificationScreenState extends State<NotificationScreen>{
               child: FutureBuilder<List<NotificationList>>(
                 future: NotificationListdata,
                 builder: (context, snapshot) {
-                  print(snapshot.hasData);
+                  //print(snapshot.hasData);
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(

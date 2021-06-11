@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -63,7 +63,7 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
         }).then((dynamic res)
     {
       final items = res[0].cast<Map<String, dynamic>>();
-      print(items);
+      //print(items);
       List<ProductKitList> listofusers = items.map<ProductKitList>((json) {
         return ProductKitList.fromJson(json);
       }).toList();
@@ -80,7 +80,7 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
         "provider_id":provider_id,
       }).then((dynamic res) async {
         setState(() {
-          print(res);
+          //print(res);
           getamt=res["sp_get_price"].toString();
         });
       });
@@ -184,7 +184,7 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
       }
       else
         {
-          print("argument are Null");
+          //print("argument are Null");
         }
     });
     return new Scaffold(
@@ -912,14 +912,14 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
                                                     Expanded(
                                                       child: InkWell(
                                                         onTap: () {
-                                                          print("Hii Patel Vatsal");
-                                                          print(order_id);
-                                                          print(prefs.getString("provider_id"));
+                                                          //print("Hii Patel Vatsal");
+                                                          //print(order_id);
+                                                          //print(prefs.getString("provider_id"));
                                                           _netUtil.post(RestDatasource.CANCEL_PROCESS_ORDER, body: {
                                                             "order_id": order_id,
                                                             "provider_id":prefs.getString("provider_id"),
                                                           }).then((dynamic res) async {
-                                                            print(res);
+                                                            //print(res);
                                                             if (res["status"] == "order service provider cancel") {
                                                               Navigator.of(context).pushNamed("/completethanks",arguments: {
                                                                 "status" : "cancel"
@@ -972,7 +972,7 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
                                       "order_id": order_id,
                                       "provider_id": prefs.getString("provider_id"),
                                     }).then((dynamic res) async {
-                                      print(res);
+                                      //print(res);
                                       if(res["status"]=="true") {
                                         FlashHelper.successBar(
                                             context, message: "OTP Sent");
@@ -1822,14 +1822,14 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
                                                     Expanded(
                                                       child: InkWell(
                                                         onTap: () {
-                                                          print("Hii Patel Vatsal");
-                                                          print(order_id);
-                                                          print(prefs.getString("provider_id"));
+                                                          //print("Hii Patel Vatsal");
+                                                          //print(order_id);
+                                                          //print(prefs.getString("provider_id"));
                                                           _netUtil.post(RestDatasource.CANCEL_PROCESS_ORDER, body: {
                                                             "order_id": order_id,
                                                             "provider_id":prefs.getString("provider_id"),
                                                           }).then((dynamic res) async {
-                                                            print(res);
+                                                            //print(res);
                                                             if (res["status"] == "order service provider cancel") {
                                                               Navigator.of(context).pushNamed("/completethanks",arguments: {
                                                                 "status" : "cancel"
@@ -1883,7 +1883,7 @@ class _LeadProgressScreenState extends State<LeadProgressScreen> {
                                       "order_id": order_id,
                                       "provider_id": prefs.getString("provider_id"),
                                     }).then((dynamic res) async {
-                                      print(res["status"]);
+                                      //print(res["status"]);
                                       if(res["status"]=="true")
                                         {
                                       FlashHelper.successBar(context, message: "OTP Sent");

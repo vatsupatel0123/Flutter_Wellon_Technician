@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:clippy_flutter/arc.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/services.dart';import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wellon_partner_app/auth.dart';
@@ -15,7 +14,6 @@ import 'package:wellon_partner_app/screens/login/login_screen_presenter.dart';
 import 'package:wellon_partner_app/utils/common_helper.dart';
 import 'package:wellon_partner_app/utils/connectionStatusSingleton.dart';
 import 'package:wellon_partner_app/utils/flash_helper.dart';
-//import 'package:wellon_partner_app/utils/flash_helper.dart';
 import 'package:wellon_partner_app/utils/internetconnection.dart';
 import 'package:flutter/material.dart';
 import 'package:wellon_partner_app/utils/network_util.dart';
@@ -70,11 +68,11 @@ class LoginSecondScreenState extends State<LoginSecondScreen> implements LoginSc
       assert(t != null);
       setState(() {
         token=t;
-        print("token  "+token);
+        //print("token  "+token);
       });
     });
     super.initState();
-    print("setstate called");
+    //print("setstate called");
     ConnectionStatusSingleton connectionStatus =
     ConnectionStatusSingleton.getInstance();
     connectionStatus.initialize();

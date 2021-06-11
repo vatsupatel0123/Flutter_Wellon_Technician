@@ -1,20 +1,34 @@
 
 import 'package:flutter/material.dart';
 class MyOrderDetailsList {
-  final String product_id;
-  final String quantity;
-  final String price;
-  final String productname;
-  final String image1;
+  String product_id;
+  String quantity;
+  String price;
+  String productname;
+  String image1;
+  String gstprice;
+  bool chkproduct;
 
 
   MyOrderDetailsList({
-    @required this.product_id,
-    @required this.quantity,
-    @required this.price,
-    @required this.productname,
-    @required this.image1,
+    this.product_id,
+    this.quantity,
+    this.price,
+    this.productname,
+    this.image1,
+    this.gstprice,
+    this.chkproduct,
   });
+
+  Map<String, dynamic> toMap() {
+    var map = new Map<String, dynamic>();
+    map["product_id"] = product_id;
+    map["quantity"] = quantity;
+    map["price"] = price;
+    map["gstprice"] = gstprice;
+    map["productname"] = productname;
+    return map;
+  }
 
   factory MyOrderDetailsList.fromJson(Map<String, dynamic> json) {
     return MyOrderDetailsList(
@@ -23,6 +37,8 @@ class MyOrderDetailsList {
       price: json['price'],
       productname: json['productname'],
       image1: json['image1'].toString(),
+      gstprice: json['gstprice'].toString(),
+      chkproduct: false,
     );
   }
 }

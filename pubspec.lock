@@ -450,8 +450,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.6"
+  in_app_update:
+    dependency: "direct main"
+    description:
+      name: in_app_update
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.15"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       url: "https://pub.dartlang.org"
@@ -548,6 +555,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.7"
+  native_updater:
+    dependency: "direct main"
+    description:
+      name: native_updater
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   nested:
     dependency: transitive
     description:
@@ -603,7 +617,7 @@ packages:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.27"
+    version: "1.6.28"
   path_provider_linux:
     dependency: transitive
     description:
@@ -653,6 +667,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
+  pinch_zoom_image_last:
+    dependency: "direct main"
+    description:
+      name: pinch_zoom_image_last
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   platform:
     dependency: transitive
     description:
@@ -805,6 +826,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0-nullsafety.1"
+  steps_indicator:
+    dependency: "direct main"
+    description:
+      name: steps_indicator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   store_redirect:
     dependency: "direct main"
     description:
@@ -917,6 +945,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0-nullsafety.3"
+  webview_flutter:
+    dependency: "direct main"
+    description:
+      name: webview_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.7"
   win32:
     dependency: transitive
     description:

@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';import 'package:flutter/services.dart';import 'package:flutter/services.dart';import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:native_updater/native_updater.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wellon_partner_app/data/loaddata.dart';
 import 'package:wellon_partner_app/data/rest_ds.dart';
 import 'package:wellon_partner_app/routes.dart';
+import 'package:wellon_partner_app/update_screen.dart';
 import 'package:wellon_partner_app/utils/flash_helper.dart';
 import 'package:wellon_partner_app/utils/network_util.dart';
 
@@ -21,22 +24,9 @@ void main() => runApp(new LoginApp(),);
 class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return new MaterialApp(
       title: 'Wellon Partner',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        accentColor: Colors.white,
-        primaryColor: Colors.white,
-        textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-          body1: GoogleFonts.roboto(textStyle: textTheme.body2),
-          body2: GoogleFonts.roboto(textStyle: textTheme.body2),
-          title: GoogleFonts.roboto(textStyle: textTheme.body2),
-          subtitle: GoogleFonts.roboto(textStyle: textTheme.body2),
-          subhead: GoogleFonts.roboto(textStyle: textTheme.body2),
-        ),
-      ),
       routes: routes,
       builder: EasyLoading.init(),
     );
@@ -60,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   NetworkUtil _netUtil = new NetworkUtil();
   String version;
+  AppUpdateInfo _updateInfo;
 
   SharedPreferences prefs;
   @override
@@ -70,14 +61,32 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
     _loadPref();
     notification();
+    //checkForUpdate();
     //checkFirstSeen();
   }
+
+  Future<void> checkForUpdate() async {
+    InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        _updateInfo = info;
+        if(_updateInfo.updateAvailable)
+          {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateScreen()));
+          }
+        print("'_updateInfo'");
+        print(_updateInfo);
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
+  }
+
   void notification(){
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
+        //print("onMessage: $message");
         //onFirebaseMessage(message);
-        print("Page : " + message['data']['order_id']);
+        //print("Page : " + message['data']['order_id']);
         Navigator.of(context).popAndPushNamed("/notificationorderpending",arguments: {
           "order_id": message['data']['order_id']
         });
@@ -119,14 +128,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         // _showItemDialog(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
+        //print("onLaunch: $message");
         Navigator.of(context).popAndPushNamed("/notificationorderpending",arguments: {
           "order_id": message['data']['order_id']
         });
         //_navigateToItemDetail(message);
       },
       onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
+        //print("onResume: $message");
         Navigator.of(context).popAndPushNamed("/notificationorderpending",arguments: {
           "order_id": message['data']['order_id']
         });
@@ -138,7 +147,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             sound: true, badge: true, alert: true, provisional: true));
     _firebaseMessaging.onIosSettingsRegistered
         .listen((IosNotificationSettings settings) {
-      print("Settings registered: $settings");
+      //print("Settings registered: $settings");
     });
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
@@ -187,7 +196,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     setState(() {
       _netUtil.post(RestDatasource.VERSION_CHECK, body: {}).then(
           (dynamic res) async {
-        print(res);
+        //print(res);
         setState(() {
           version = res["version"].toString();
           //version = "2.0";
@@ -353,7 +362,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 Container(
                   padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
                   child: CircularProgressIndicator(
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: Colors.white,
                                     ),
                 ),
               ],

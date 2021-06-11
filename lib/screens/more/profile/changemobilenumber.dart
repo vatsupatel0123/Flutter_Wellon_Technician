@@ -54,7 +54,7 @@ class _ChangeMobileNumberScreenState extends State<ChangeMobileNumberScreen> {
     _focus.addListener(_onFocusChange);
   }
   void _onFocusChange(){
-    debugPrint("Focus: "+_focus.hasFocus.toString());
+    //debugPrint("Focus: "+_focus.hasFocus.toString());
     if(_focus.hasFocus)
     {
       setState(() {
@@ -102,7 +102,7 @@ class _ChangeMobileNumberScreenState extends State<ChangeMobileNumberScreen> {
         _oldnumber_namecontroller.text=_oldnumber;
       });
     }else{
-      print("argument are Null");
+      //print("argument are Null");
     }
     return new Scaffold(
       //resizeToAvoidBottomPadding: false,
@@ -214,7 +214,7 @@ class _ChangeMobileNumberScreenState extends State<ChangeMobileNumberScreen> {
                           "mobile_numbers":_oldnumber,
                           "new_mobile_number": _newph,
                         }).then((dynamic res) async {
-                          print(res);
+                          //print(res);
                           if (res["contact"] == "Contact Number Update After Otp Confirmation") {
                             formKey.currentState.reset();
                             setState(() {

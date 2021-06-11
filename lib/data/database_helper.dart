@@ -34,7 +34,7 @@ class DatabaseHelper {
     // When creating the db, create the table
     await db.execute(
         "CREATE TABLE User(id INTEGER PRIMARY KEY, first_name TEXT, mobile_numbers TEXT)");
-    print("Created tables");
+    //print("Created tables");
     final String CREATE_CART_TABLE = "CREATE TABLE AddToCart("
         "TableId INTEGER PRIMARY KEY AUTOINCREMENT, "
         "category_id TEXT, "
